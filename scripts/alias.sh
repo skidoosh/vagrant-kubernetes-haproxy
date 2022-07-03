@@ -1,0 +1,1 @@
+echo 'alias k="kubectl"' >> .bashrc
