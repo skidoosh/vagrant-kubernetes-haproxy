@@ -28,7 +28,7 @@ curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
 sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
 
 sudo apt-get update
-sudo apt-get upgrade -y
+
 sudo apt-get install -y vault
 sudo apt-mark hold vault
 
@@ -80,8 +80,8 @@ if [ "$(sudo VAULT_ADDR=${VAULT_ADDRESS} vault status | tr -d '\011\012\013\014\
         fi
     done < ${VAULT_CREDS}
 
-    for (( i=0; i<${threshold}; i++ ))
+    for (( i=0; i<${THRESHOLD}; i++ ))
     do
-        sudo VAULT_ADDR=${VAULT_ADDRESS} vault operator unseal ${keys[i]}
+        sudo VAULT_ADDR=${VAULT_ADDRESS} vault operator unseal ${KEYS[i]}
     done
 fi

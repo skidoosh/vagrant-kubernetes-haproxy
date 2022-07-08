@@ -2,8 +2,6 @@
 #
 # Setup for worker node loadbalancer
 
-sudo apt-get update
-sudo apt-get upgrade -y
 sudo apt-get install -y haproxy
 sudo apt-mark hold haproxy
 

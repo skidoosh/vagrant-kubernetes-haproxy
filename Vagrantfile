@@ -19,8 +19,9 @@ Vagrant.configure("2") do |config|
                                      "NUM_WORKER_NODES" => NUM_WORKER_NODES,
                                      "IP_START" => IP_START}, 
                                inline: <<-SHELL
-    apt-get update -y
-    apt-get upgrade -y
+    sudo apt-get update
+    sudo apt-get upgrade -y
+    sudo apt-get install -y apt-transport-https ca-certificates curl jq
 
     echo "$IP_CONSUL consul" >> /etc/hosts
     echo "$IP_VAULT vault" >> /etc/hosts
@@ -39,7 +40,7 @@ Vagrant.configure("2") do |config|
   #   consul.vm.hostname = "consul"
   #   consul.vm.network "private_network", ip: IP_CONSUL
   #   consul.vm.provider "virtualbox" do |vb|
-  #       vb.memory = 256
+  #       vb.memory = 1024
   #       vb.cpus = 1
   #   end
 
@@ -50,7 +51,7 @@ Vagrant.configure("2") do |config|
     vault.vm.hostname = "vault"
     vault.vm.network "private_network", ip: IP_VAULT
     vault.vm.provider "virtualbox" do |vb|
-        vb.memory = 256
+        vb.memory = 1024
         vb.cpus = 1
     end
 
@@ -91,7 +92,7 @@ Vagrant.configure("2") do |config|
       loadbalancer.vm.network :forwarded_port, guest: i, host: i
     end
     loadbalancer.vm.provider "loadbalancer" do |vb|
-        vb.memory = 256
+        vb.memory = 1024
         vb.cpus = 1
     end
 
