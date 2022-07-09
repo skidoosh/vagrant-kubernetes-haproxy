@@ -20,10 +20,6 @@ VAULT_CREDS="/vagrant/configs/vault.txt"
 VAULT_DATA="/opt/vault/data"
 VAULT_PROFILE="/etc/profile.d/vault.sh"
 
-VAULT_ROOT_REGEX="(hvs\.[a-zA-Z0-9]{24})$"
-VAULT_SEAL_REGEX="Unseal Key [1-5]{1}: ([a-zA-Z0-9+\/]{44})"
-VAULT_THRESHOLD_REGEX="threshold of ([0-9]){1}"
-
 curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
 sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
 
