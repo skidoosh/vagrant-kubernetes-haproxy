@@ -34,8 +34,6 @@ sudo apt-mark hold vault
 
 sudo tee ${VAULT_CONFIG} > /dev/null <<-CONFIG
   ui = ${VAULT_ENABLE_UI}
-  api_addr = "${VAULT_API_ADDRESS}"
-  cluster_addr = "${VAULT_CLUSTER_ADDRESS}"
   log_level = "${VAULT_LOG_LEVEL}"
 
   storage "file" {
@@ -58,30 +56,4 @@ sudo systemctl enable vault
 
 if [[ ! "$(ls -A ${VAULT_DATA})" ]]; then
     sudo VAULT_ADDR=${VAULT_ADDRESS} vault operator init > ${VAULT_CREDS}
-fi
-
-if [ "$(sudo VAULT_ADDR=${VAULT_ADDRESS} vault status | tr -d '\011\012\013\014\015\040' | grep -c 'Sealedtrue')" -gt 0 ]; then
-    declare KEYS=()
-    ROOT=""
-    THRESHOLD=0
-
-    while read l
-    do
-        if [[ $l =~ ${VAULT_SEAL_REGEX} ]]; then
-            KEYS+=(${BASH_REMATCH[1]})
-        fi
-
-        if [[ $l =~ ${VAULT_ROOT_REGEX} ]]; then
-            ROOT=${BASH_REMATCH[0]}
-        fi
-
-        if [[ $l =~ ${VAULT_THRESHOLD_REGEX} ]]; then
-            THRESHOLD=${BASH_REMATCH[1]}
-        fi
-    done < ${VAULT_CREDS}
-
-    for (( i=0; i<${THRESHOLD}; i++ ))
-    do
-        sudo VAULT_ADDR=${VAULT_ADDRESS} vault operator unseal ${KEYS[i]}
-    done
 fi

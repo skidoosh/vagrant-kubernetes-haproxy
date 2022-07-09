@@ -56,6 +56,7 @@ Vagrant.configure("2") do |config|
     end
 
     vault.vm.provision "shell", path: "scripts/vault.sh"
+    vault.vm.provision "shell", path: "scripts/vault_unseal.sh", run: "always"
   end
 
   config.vm.define "controller" do |controller|
@@ -87,7 +88,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "loadbalancer" do |loadbalancer|
     loadbalancer.vm.hostname = "loadbalancer"
-    loadbalancer.vm.network "private_network", ip: IP_VAULT
+    loadbalancer.vm.network "private_network", ip: IP_LOADBALANCER
     for i in 8000..10000
       loadbalancer.vm.network :forwarded_port, guest: i, host: i
     end

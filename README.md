@@ -37,7 +37,7 @@ $ kubectl get po
 To rebuild the loadbalancer use the following commands:
 ```
 $ chmod +x setup/loadbalancer.sh
-$ ./setup/loadbalancer.sh
+$ ./tools/loadbalancer.sh
 ```
 
 Once the script has finished. Open the configs/haproxy.cnf file to get the ports your service is running on then open your browser at http://localhost:[bind port from config].
