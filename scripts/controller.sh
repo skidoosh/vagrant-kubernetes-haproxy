@@ -1,45 +1,36 @@
 #!/bin/bash
 #
-# Setup for Control Plane servers
-set -euxo pipefail
+# Setup for Control Plane server
 
-NODENAME=$(hostname -s)
+# variables
+
+CONFIG_PATH="/vagrant/configs"
+
+USER_USERNAME="vagrant"
+USER_HOME=$(getent passwd "${USER_USERNAME}" | cut -d: -f6)
+USER_UID=$(id -u ${USER_USERNAME})
+USER_GID=$(id -g ${USER_USERNAME})
 
 sudo kubeadm config images pull
 
-echo "Preflight Check Passed: Downloaded All Required Images"
-sudo kubeadm init --apiserver-advertise-address=$CONTROLLER_IP \
-                  --apiserver-cert-extra-sans=$CONTROLLER_IP \
-                  --pod-network-cidr=$POD_CIDR \
-                  --node-name "$NODENAME" \
+sudo kubeadm init --apiserver-advertise-address=${CONTROLLER_IP} \
+                  --apiserver-cert-extra-sans=${CONTROLLER_IP} \
+                  --pod-network-cidr=${POD_CIDR} \
+                  --node-name $(hostname -s) \
                   --ignore-preflight-errors Swap
 
-mkdir -p "$HOME"/.kube
-sudo cp -i /etc/kubernetes/admin.conf "$HOME"/.kube/config
-sudo chown "$(id -u)":"$(id -g)" "$HOME"/.kube/config
+if [[ -f "${CONFIG_PATH}/config" ]]; then rm -f ${CONFIG_PATH}/config; fi;
+if [[ -f "${CONFIG_PATH}/join.sh" ]]; then rm -f ${CONFIG_PATH}/join.sh; fi;
+if [[ ! -d "${CONFIG_PATH}" ]]; then mkdir -p ${CONFIG_PATH}; fi;
 
-# Save Configs to shared /Vagrant location
-# For Vagrant re-runs, check if there is existing configs in the location and delete it for saving new configuration.
-config_path="/vagrant/configs"
+cp -i /etc/kubernetes/admin.conf ${CONFIG_PATH}/config
+touch ${CONFIG_PATH}/join.sh
+chmod +x ${CONFIG_PATH}/join.sh
 
-if [ -d $config_path ]; then
-  rm -f $config_path/*
-else
-  mkdir -p $config_path
-fi
+kubeadm token create --print-join-command > ${CONFIG_PATH}/join.sh
 
-cp -i /etc/kubernetes/admin.conf /vagrant/configs/config
-touch /vagrant/configs/join.sh
-chmod +x /vagrant/configs/join.sh
+mkdir -p ${USER_HOME}/.kube
+sudo cp -i ${CONFIG_PATH}/config ${USER_HOME}/.kube/
+sudo chown ${USER_UID}:${USER_GID} ${USER_HOME}/.kube/config
 
-kubeadm token create --print-join-command > /vagrant/configs/join.sh
-
-# Install Calico Network Plugin
-kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
-
-sudo -i -u vagrant bash << EOF
-whoami
-mkdir -p /home/vagrant/.kube
-sudo cp -i /vagrant/configs/config /home/vagrant/.kube/
-sudo chown 1000:1000 /home/vagrant/.kube/config
-EOF
+sudo -i -u ${USER_USERNAME} kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml

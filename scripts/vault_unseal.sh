@@ -2,12 +2,14 @@
 #
 # Unseal vault servers after provision or boot
 
-set -euxo pipefail
+# variables
+
+CONFIG_PATH="/vagrant/configs"
 
 VAULT_PORT=${VAULT_PORT:-8200}
 VAULT_PROTOCOL=${VAULT_PROTOCOL:-http}
 VAULT_ADDRESS="${VAULT_PROTOCOL}://127.0.0.1:${VAULT_PORT}"
-VAULT_CREDS="/vagrant/configs/vault.txt"
+VAULT_CREDS="${CONFIG_PATH}/vault.txt"
 VAULT_ROOT_REGEX="(hvs\.[a-zA-Z0-9]{24})$"
 VAULT_SEAL_REGEX="Unseal Key [1-5]{1}: ([a-zA-Z0-9+\/]{44})"
 VAULT_THRESHOLD_REGEX="threshold of ([0-9]){1}"

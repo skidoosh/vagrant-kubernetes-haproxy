@@ -2,15 +2,18 @@
 #
 # Setup for worker node servers
 
-set -euxo pipefail
+# variables
 
-/bin/bash /vagrant/configs/join.sh -v
+CONFIG_PATH="/vagrant/configs"
 
-sudo -i -u vagrant bash << EOF
-whoami
-mkdir -p /home/vagrant/.kube
-sudo cp -i /vagrant/configs/config /home/vagrant/.kube/
-sudo chown 1000:1000 /home/vagrant/.kube/config
-NODENAME=$(hostname -s)
-kubectl label node $(hostname -s) node-role.kubernetes.io/worker=worker
-EOF
+USER_USERNAME="vagrant"
+USER_HOME=$(getent passwd "${USER_USERNAME}" | cut -d: -f6)
+USER_UID=$(id -u ${USER_USERNAME})
+USER_GID=$(id -g ${USER_USERNAME})
+
+/bin/bash ${CONFIG_PATH}/join.sh -v
+
+mkdir -p ${USER_HOME}/.kube
+sudo cp -i ${CONFIG_PATH}/config ${USER_HOME}/.kube/
+sudo chown ${USER_UID}:${USER_GID} ${USER_HOME}/.kube/config
+sudo -i -u ${USER_USERNAME} kubectl label node $(hostname -s) node-role.kubernetes.io/worker=worker

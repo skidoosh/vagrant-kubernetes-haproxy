@@ -2,7 +2,9 @@
 #
 # Setup for vault servers
 
-set -euxo pipefail
+#variables
+
+CONFIG_PATH="/vagrant/configs"
 
 VAULT_CLUSTER_PORT=${VAULT_CLUSTER_PORT:-8201}
 VAULT_ENABLE_UI=${VAULT_ENABLE_UI:-true}
@@ -16,7 +18,7 @@ VAULT_API_ADDRESS="${VAULT_PROTOCOL}://${VAULT_HOST}:${VAULT_PORT}"
 VAULT_CLUSTER_ADDRESS="${VAULT_PROTOCOL}://${VAULT_HOST}:${VAULT_CLUSTER_PORT}"
 
 VAULT_CONFIG="/etc/vault.d/vault.hcl"
-VAULT_CREDS="/vagrant/configs/vault.txt"
+VAULT_CREDS="${CONFIG_PATH}/vault.txt"
 VAULT_DATA="/opt/vault/data"
 VAULT_PROFILE="/etc/profile.d/vault.sh"
 
@@ -24,7 +26,6 @@ curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
 sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
 
 sudo apt-get update
-
 sudo apt-get install -y vault
 sudo apt-mark hold vault
 

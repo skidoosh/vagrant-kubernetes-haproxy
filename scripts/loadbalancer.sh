@@ -2,10 +2,13 @@
 #
 # Setup for worker node loadbalancer
 
+# variables
+
+NODES=""
+
 sudo apt-get install -y haproxy
 sudo apt-mark hold haproxy
 
-NODES=""
 for i in $(seq 1 $NUM_WORKER_NODES); do
     NODES+="server node_${i} $IP_KUBE_WORKERS$((IP_START + i)):10250 check check-ssl verify none
     "
@@ -13,7 +16,7 @@ done
 
 cp /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.orig
 
-cat > /etc/haproxy/haproxy.cfg <<-EOD
+cat > /etc/haproxy/haproxy.cfg <<EOD
 global
     log /dev/log    local0
     log /dev/log    local1 notice
