@@ -1,0 +1,22 @@
+#!/bin/bash
+#
+# Vault exection helper
+
+# variables
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+VAULT_ROOT_REGEX="(hvs\.[a-zA-Z0-9]{24})"
+VAULT_IP_REGEX="IP_VAULT=\"(([0-9\.]{1,4}){4})\""
+VAULT_CREDS=$(cat ${SCRIPT_DIR}/../configs/vault.txt)
+VAULT_IP=$(cat ${SCRIPT_DIR}/../Vagrantfile)
+
+[[ ${VAULT_IP} =~ ${VAULT_IP_REGEX} ]]
+
+export VAULT_ADDR=http://${BASH_REMATCH[1]}:8200
+
+[[ ${VAULT_CREDS} =~ ${VAULT_ROOT_REGEX} ]]
+
+export VAULT_TOKEN=${BASH_REMATCH[0]}
+
+vault $@
